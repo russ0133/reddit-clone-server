@@ -1,12 +1,12 @@
 import { MikroORM } from "@mikro-orm/core";
 import { __prod__ } from "./constants";
-import { Post } from "./entities/Post";
 import microConfig from "./mikro-orm.config";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
 import { HelloResolver } from "./resolvers/hello";
 import { PostResolver } from "./resolvers/post";
+import { Post } from "./entities/Post";
 
 const main = async () => {
   const orm = await MikroORM.init(microConfig);
@@ -16,7 +16,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [HelloResolver],
+      resolvers: [HelloResolver, PostResolver],
       validate: false,
     }),
     context: () => ({ em: orm.em }),
@@ -25,12 +25,10 @@ const main = async () => {
   await apolloServer.start();
   apolloServer.applyMiddleware({ app });
 
+  const posts = await orm.em.find(Post, {});
+  console.log(posts);
   app.get("/", (_, res) => {
     res.send("hello");
-  });
-
-  app.get("/rs", (_, res) => {
-    res.send("heleslo");
   });
 
   app.listen(4000, () => {
