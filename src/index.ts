@@ -4,9 +4,7 @@ import microConfig from "./mikro-orm.config";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
-import { HelloResolver } from "./resolvers/hello";
-import { PostResolver } from "./resolvers/post";
-import { Post } from "./entities/Post";
+import { HelloResolver, PostResolver, UserResolver } from "./resolvers";
 
 const main = async () => {
   const orm = await MikroORM.init(microConfig);
@@ -16,7 +14,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [HelloResolver, PostResolver],
+      resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false,
     }),
     context: () => ({ em: orm.em }),
@@ -25,8 +23,6 @@ const main = async () => {
   await apolloServer.start();
   apolloServer.applyMiddleware({ app });
 
-  const posts = await orm.em.find(Post, {});
-  console.log(posts);
   app.get("/", (_, res) => {
     res.send("hello");
   });

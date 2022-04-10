@@ -1,7 +1,7 @@
 import { __prod__ } from "./constants";
-import { Post } from "./entities/Post";
 import { Options } from "@mikro-orm/core";
 import path from "path";
+import { User, Post } from "./entities/index";
 
 export default {
   migrations: {
@@ -9,7 +9,7 @@ export default {
     pathTs: path.join(__dirname, "./migrations"), // path to the folder with TS migrations (if used, we should put path to compiled files in `path`)
     glob: "!(*.d).{js,ts}",
   },
-  entities: [Post],
+  entities: [Post, User],
   dbName: "topreddit",
   type: "postgresql",
   debug: !__prod__,
